@@ -1,0 +1,26 @@
+{
+  "name": "pasar",
+  "version": "1.0.0",
+  "description": "ecommerce blockchain",
+  "homepage": "https://github.com/AfricBloc/pasar-backend#readme",
+  "bugs": {
+    "url": "https://github.com/AfricBloc/pasar-backend/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AfricBloc/pasar-backend.git"
+  },
+  "license": "ISC",
+  "author": "pasar team",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "nodemon": "^3.1.10"
+  }
+}
