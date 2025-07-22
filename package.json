@@ -12,15 +12,23 @@
   },
   "license": "ISC",
   "author": "pasar team",
-  "type": "module",
-  "main": "index.js",
+  "type": "commonjs",
+  "main": "app.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js"
+    "dev": "nodemon --watch . --ext ts --exec ts-node app.ts",
+    "build": "tsc",
+    "start": "node dist/app.js"
   },
   "dependencies": {
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
     "nodemon": "^3.1.10"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.0.15",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
   }
 }
