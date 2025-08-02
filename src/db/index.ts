@@ -1,12 +1,23 @@
-import pkg from 'pg';
-
+import pkg from "pg";
+import { DATABASE_URL } from "../config/env";
 const { Pool } = pkg;
 
 const poolConfig = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: {
-        rejectUnauthorized: false,
-    },
+  //connectionString: process.env.DATABASE_URL,
+  connectionString: DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
+//Check if the db connection is successful
+export async function verifyDBConnection() {
+  try {
+    await poolConfig.query("SELECT 1");
+    console.log(`PostgreSQL connection successful`);
+  } catch (err: unknown) {
+    console.error(`PostgreSQL connection failed ${err}`);
+    process.exit(1);
+  }
+}
 
 export default poolConfig;

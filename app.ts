@@ -1,12 +1,29 @@
-import express from 'express';
+//THIS IS THE MAIN SETUP FOR THE SERVER
+//MAIN SERVER IS THE SERVER.TS
+
+import express from "express";
+//import dotenv from "dotenv";
+//dotenv.config();
+//Created a new file for env variable inside the config folder so just add your .env.development.local
+import userRouter from "./src/router/user.router";
+import errorMiddleware from "./src/middleware/error.middleware";
+import createUserTable from "./src/data/createUserTable";
+import authRouter from "./src/router/auth.router";
+
 const app = express();
-import dotenv from 'dotenv';
-dotenv.config();
-import userRouter from './src/router/userRouter';
 
+//Global Middleware
 app.use(express.json());
-app.use('/api', userRouter);
+//app.use(cors())
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server is running on port ${process.env.PORT}`);
-});
+//Error handling middleware
+//app.use(errorMiddleware);
+
+//Autocreate Table
+createUserTable();
+
+//API Routes
+app.use("/api/v1/users", userRouter);
+app.use("/api/v1/auth", authRouter);
+
+export default app;
