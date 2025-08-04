@@ -13,12 +13,14 @@ import { sendOTPEmail } from "./src/utils/mailer/sendOTP";
 import { generatedOTP } from "./src/middleware";
 import { otpData } from "./src/utils/otp-utils/otpDataGenerator";
 import createOtpTable from "@/data/createOtpTable";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
 //Global Middleware
 app.use(express.json());
 //app.use(cors())
+app.use(cookieParser());
 
 //Error handling middleware
 //app.use(errorMiddleware);

@@ -11,6 +11,10 @@ import {
   createOTP,
   verifyOTP,
 } from "@/controller/authControllers.ts/otp.controller";
+import {
+  googleCallback,
+  redirectToGoogle,
+} from "@/controller/authControllers.ts/oauth.controller";
 
 const authRouter = Router();
 
@@ -28,4 +32,7 @@ authRouter.post(
 authRouter.post("/signout", authMiddleware, (req: Request, res: Response) => {
   res.send("signout");
 });
+authRouter.get("/google", redirectToGoogle);
+authRouter.get("/google/callback", googleCallback);
+
 export default authRouter;

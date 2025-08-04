@@ -10,4 +10,7 @@ export const {
   JWT_EXPIRES_IN,
   EMAIL_USER,
   EMAIL_PASS,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  REDIRECT_URL,
 } = process.env;
