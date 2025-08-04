@@ -9,6 +9,10 @@ import userRouter from "./src/router/user.router";
 import errorMiddleware from "./src/middleware/error.middleware";
 import createUserTable from "./src/data/createUserTable";
 import authRouter from "./src/router/auth.router";
+import { sendOTPEmail } from "./src/utils/mailer/sendOTP";
+import { generatedOTP } from "./src/middleware";
+import { otpData } from "./src/utils/otp-utils/otpDataGenerator";
+import createOtpTable from "@/data/createOtpTable";
 
 const app = express();
 
@@ -19,9 +23,11 @@ app.use(express.json());
 //Error handling middleware
 //app.use(errorMiddleware);
 
-//Autocreate Table
+//Autocreate Tables
 createUserTable();
+createOtpTable();
 
+// Call to generate OTP data
 //API Routes
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/auth", authRouter);

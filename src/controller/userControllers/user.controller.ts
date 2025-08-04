@@ -1,6 +1,6 @@
-import { sendError, sendSuccess } from "../utils/response/index";
+import { sendError, sendSuccess } from "../../utils/response/index";
 import { Request, Response } from "express";
-import poolConfig from "../db/index";
+import poolConfig from "../../db/index";
 import bcrypt from "bcryptjs";
 
 const getSingleUser = async (req: Request, res: Response) => {

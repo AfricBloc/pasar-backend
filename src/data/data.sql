@@ -3,5 +3,14 @@ CREATE TABLE IF NOT EXISTS users(
     username VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL,
     password VARCHAR(100) NOT NULL,
+    isVerified BOOLEAN DEFAULT false,
     created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS otp_data(
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    hashed_otp VARCHAR(100) NOT NULL,
+    expiry TIMESTAMP NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
