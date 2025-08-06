@@ -2,7 +2,7 @@ import { sendError, sendSuccess } from "../../utils/response/index";
 import { NextFunction, Request, Response } from "express";
 import poolConfig from "../../db/index";
 import bcrypt from "bcryptjs";
-import { JWT_EXPIRES_IN, JWT_SECRET } from "../../config/env";
+import { JWT_EXPIRES_IN, JWT_SECRET } from "../../config/env.config";
 import jwt, { SignOptions, Secret } from "jsonwebtoken";
 import { sanitizer } from "../../utils/sanitizer/sanitizeUser";
 //This function is not yet completed it does generate tokens
@@ -15,6 +15,7 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
 
   // Check if the user already exists
   const existingUser = await poolConfig.query(
+    //This would be changed to a prisma and not direct DB query
     "SELECT * FROM users WHERE email = $1",
     [email]
   );
@@ -24,6 +25,7 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
 
   try {
     const result = await poolConfig.query(
+      //This would be changed to a prisma and not direct DB query
       "INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING *",
       [username, email, password]
     );
@@ -66,6 +68,7 @@ const signIn = async (req: Request, res: Response, next: NextFunction) => {
   try {
     //Validating email
     const userExist = await poolConfig.query(
+      //This would be changed to a prisma and not direct DB query
       `SELECT id, username, email, password FROM users WHERE lower(email) = lower($1) LIMIT 1`,
       [email]
     );
@@ -111,5 +114,14 @@ const signIn = async (req: Request, res: Response, next: NextFunction) => {
   } catch (err) {
     next(err);
   }
+};
+const logout = (req: Request, res: Response) => {
+  res.clearCookie("session", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/", // ensure same path as set
+  });
+  res.status(200).json({ message: "Logged out" });
 };
 export { createUser, signIn };

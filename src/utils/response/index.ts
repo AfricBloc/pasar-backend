@@ -22,15 +22,4 @@ const sendSuccess = (
   });
 };
 
-const generateOTP = (length: any) => {
-  let otp: any = [];
-
-  for (let i = 0; i < length; i++) {
-    let generatotp = Math.round(Math.random() * 9);
-    otp += generatotp;
-  }
-
-  return otp;
-};
-
-export { sendError, sendSuccess, generateOTP };
+export { sendError, sendSuccess };

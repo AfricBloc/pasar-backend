@@ -2,7 +2,7 @@ import {
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
   REDIRECT_URL,
-} from "@/config/env";
+} from "@/config/env.config";
 import fetch from "node-fetch";
 import { any } from "zod";
 
@@ -19,9 +19,9 @@ const getGoogleAuthURL = (state: string): string => {
   //Import the process.env var from env.js
   const params = {
     client_id: GOOGLE_CLIENT_ID, //Remember to add this in your .env.development.local
-    redirect_url: `${REDIRECT_URL}/api/v1/auth/google/callback`,
+    redirect_uri: `${REDIRECT_URL}/api/v1/auth/google/callback`,
     response_type: "code",
-    scope: ["openId", "email", "profile"].join(" "),
+    scope: ["openid", "email", "profile"].join(" "),
     state,
     access_type: "offline",
     prompt: "consent",
@@ -41,11 +41,13 @@ const getToken = async (code?: string): Promise<any> => {
 
   const values: Record<string, string> = {
     code,
-    client_id: process.env.GOOGLE_CLIENT_ID ?? "",
-    client_secret: process.env.GOOGLE_CLIENT_SECRET ?? "",
-    redirect_uri: `${process.env.BASE_URL}/api/auth/v1/google/callback`, // correct param name
+    client_id: GOOGLE_CLIENT_ID ?? "",
+    client_secret: GOOGLE_CLIENT_SECRET ?? "",
+    redirect_uri: `${REDIRECT_URL}/api/auth/v1/google/callback`, // correct param name
     grant_type: "authorization_code",
   };
+
+  console.log(values);
 
   // POST request to exchange code for tokens
   const response = await fetch(tokenEndpoint, {

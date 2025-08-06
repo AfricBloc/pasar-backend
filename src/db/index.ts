@@ -1,5 +1,5 @@
 import pkg from "pg";
-import { DATABASE_URL } from "../config/env";
+import { DATABASE_URL } from "../config/env.config";
 const { Pool } = pkg;
 
 const poolConfig = new Pool({

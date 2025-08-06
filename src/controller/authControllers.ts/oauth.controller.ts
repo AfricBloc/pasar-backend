@@ -1,10 +1,12 @@
 import { OAuth2Client } from "google-auth-library";
+import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import { GOOGLE_CLIENT_ID, NODE_ENV } from "@/config/env";
+import { GOOGLE_CLIENT_ID, JWT_SECRET, NODE_ENV } from "@/config/env.config";
 import { Request, Response } from "express";
 import { getGoogleAuthURL, getToken } from "@/utils/authUtils/oauths";
 import { sendError } from "@/middleware";
 import { sendSuccess } from "@/utils/response";
+import poolConfig from "@/db";
 
 //Init Google's verifier client once
 const oauthClient = new OAuth2Client(GOOGLE_CLIENT_ID);
@@ -72,7 +74,97 @@ export const googleCallback = async (req: Request, res: Response) => {
     if (!payload) {
       return sendError(res, "Invalid ID token payload", 401);
     }
+    const { sub: googleId, email, name, picture, email_verified } = payload;
 
+    if (!email) {
+      return res.status(400).json({ error: "Email not provided by Google" });
+    }
+
+    // Start user upsert/link logic
+    // 1. Try to find by google_id
+    let userRes = await poolConfig.query(
+      "SELECT * FROM users WHERE google_id = $1",
+      [googleId]
+    );
+
+    let user;
+    if (userRes.rows.length === 0) {
+      // 2. Try to find by email (existing non-Google user)
+      userRes = await poolConfig.query("SELECT * FROM users WHERE email = $1", [
+        email,
+      ]);
+
+      if (userRes.rows.length === 0) {
+        // 3. Create new user via Google login
+        const insertRes = await poolConfig.query(
+          `INSERT INTO users 
+            (email, email_verified, google_id, full_name, picture_url, is_active, metadata)
+           VALUES ($1, $2, $3, $4, $5, TRUE, '{}'::jsonb)
+           RETURNING *`,
+          [
+            email,
+            email_verified ?? true,
+            googleId,
+            name || null,
+            picture || null,
+          ]
+        );
+        user = insertRes.rows[0];
+      } else {
+        // Existing user with same email: link Google account
+        user = userRes.rows[0];
+        if (!user.google_id) {
+          await poolConfig.query(
+            `UPDATE users 
+             SET google_id = $1, email_verified = TRUE, full_name = COALESCE($2, full_name), picture_url = COALESCE($3, picture_url)
+             WHERE id = $4`,
+            [googleId, name, picture, user.id]
+          );
+          const updated = await poolConfig.query(
+            "SELECT * FROM users WHERE id = $1",
+            [user.id]
+          );
+          user = updated.rows[0];
+        }
+      }
+    } else {
+      user = userRes.rows[0];
+      // Optionally: refresh picture/name if changed
+      await poolConfig.query(
+        `UPDATE users 
+         SET full_name = COALESCE($1, full_name), picture_url = COALESCE($2, picture_url)
+         WHERE id = $3`,
+        [name, picture, user.id]
+      );
+      const refreshed = await poolConfig.query(
+        "SELECT * FROM users WHERE id = $1",
+        [user.id]
+      );
+      user = refreshed.rows[0];
+    }
+
+    console.log("user:", user);
+    // Issue application JWT (minimal claims)
+    const appToken = jwt.sign(
+      { userId: user.id, email: user.email },
+      JWT_SECRET!,
+      { expiresIn: "7d" }
+    );
+
+    // Secure session cookie
+    res.cookie("session", appToken, {
+      httpOnly: true,
+      secure: NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    // Optionally update last_login_at
+    await poolConfig.query(
+      "UPDATE users SET last_login_at = NOW() WHERE id = $1",
+      [user.id]
+    );
+    //return res.redirect("/home"); // replace with your post-login
     return sendSuccess(
       res,
       "Authentication successful",

@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import { EMAIL_USER, EMAIL_PASS } from "../../config/env";
+import { EMAIL_USER, EMAIL_PASS } from "../../config/env.config";
 
 if (!EMAIL_USER || !EMAIL_PASS) {
   throw new Error(

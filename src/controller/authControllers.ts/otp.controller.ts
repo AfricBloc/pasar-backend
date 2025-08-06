@@ -1,8 +1,152 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
+import crypto from "crypto";
+import { PrismaClient } from "@prisma/client";
+import { redis } from "@/utils/redisClient/redis";
+import { sendSuccess, sendError } from "@/utils/response";
+import generateOTPData from "@/utils/otp-utils/otpDataGenerator";
+import { sendOTPEmail } from "@/utils/mailer/sendOTP";
+
+const prisma = new PrismaClient();
+
+const RESEND_TTL = 24 * 3600; // seconds
+const MAX_RESEND = 5; //Number of times a user can resend
+
+/**
+ * POST /api/otp
+ * Generate & send an OTP
+ */
+export const createOtp = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { userId, email } = (req as any).user || {};
+    if (!userId || !email) {
+      return sendError(res, "Unauthorized or missing email in token", 401);
+    }
+
+    // Rate-limit check
+    const resendKey = `otp:resend:${userId}`;
+    const count = await redis.incr(resendKey);
+    if (count === 1) {
+      await redis.expire(resendKey, RESEND_TTL);
+    }
+    if (count > MAX_RESEND) {
+      return sendError(res, "Resend limit reached for today", 429);
+    }
+
+    // Generate OTP data
+    const { OTP_TTL, otp, hashedOtp, expiry } = await generateOTPData();
+
+    // Store hashed OTP in Redis
+    await redis.set(`otp:${userId}`, hashedOtp, "EX", OTP_TTL);
+
+    // Persist in Postgres via Prisma
+    const record = await prisma.otpData.create({
+      data: {
+        userId,
+        otpHash: hashedOtp,
+        expiresAt: expiry,
+      },
+    });
+
+    // TODO: send `otp` via email/SMS
+    await sendOTPEmail(email, otp);
+
+    return sendSuccess(res, "OTP created and sent", { otpId: record.id }, 201);
+  } catch (err) {
+    console.error("Error in createOtp:", err);
+    next(err);
+    return sendError(res, "Failed to create OTP", 500);
+  }
+};
+
+/**
+ * POST /api/otp/resend
+ * Just re-uses createOtp logic
+ */
+export const resendOtp = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => createOtp(req, res, next);
+
+/**
+ * POST /api/otp/verify
+ * Verify a submitted OTP
+ */
+
+export const verifyOtp = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { userId } = (req as any).user || {};
+    const { otp } = req.body as { otp?: string };
+
+    if (!userId) {
+      return sendError(res, "Unauthorized", 401);
+    }
+    if (!otp || !/^\d{6}$/.test(otp)) {
+      return sendError(res, "Invalid OTP format", 400);
+    }
+
+    // 1. Fetch the stored hash from Redis (this also handles the 5-min TTL)
+    const storedHash = await redis.get(`otp:${userId}`);
+    if (!storedHash) {
+      return sendError(res, "OTP expired or not found", 400);
+    }
+
+    // 2. Compare incoming OTP
+    const incomingHash = crypto.createHash("sha256").update(otp).digest("hex");
+    if (incomingHash !== storedHash) {
+      return sendError(res, "Incorrect OTP", 400);
+    }
+
+    // 3. Fetch the corresponding DB record to check expiry & used status
+    const otpRecord = await prisma.otpData.findFirst({
+      where: {
+        userId,
+        otpHash: storedHash,
+      },
+    });
+
+    if (!otpRecord) {
+      return sendError(res, "OTP record not found", 400);
+    }
+    if (otpRecord.used) {
+      return sendError(res, "OTP already used", 400);
+    }
+    if (otpRecord.expiresAt < new Date()) {
+      return sendError(res, "OTP has expired", 400);
+    }
+
+    // 4. Mark it used
+    await prisma.otpData.update({
+      where: { id: otpRecord.id },
+      data: { used: true },
+    });
+
+    // 5. Cleanup Redis
+    await redis.del(`otp:${userId}`);
+
+    return sendSuccess(res, "OTP verified successfully", null, 200);
+  } catch (err) {
+    console.error("Error in verifyOtp:", err);
+    next(err);
+    return sendError(res, "Failed to verify OTP", 500);
+  }
+};
+
+/*import { NextFunction, Request, Response } from "express";
 import { sendSuccess, sendError } from "@/utils/response";
 import poolConfig from "@/db";
 import { generateOTPData, otpData } from "@/utils/otp-utils/otpDataGenerator";
 import { compareOtp, deleteOtp, isExpired } from "@/utils/otp-utils/otpUtils";
+import { PrismaClient } from '@prisma/client';
+import { redis } from "@/utils/redisClient/redis"
 
 const createOTP = async (
   req: Request, // or AuthenticatedRequest if you've extended globally
@@ -10,6 +154,14 @@ const createOTP = async (
   next: NextFunction
 ) => {
   try {
+
+      await redis.set(`otp:${userId}`, otp, 'EX', OTP_TTL);
+  // log in Postgres
+  await prisma.otpLog.create({
+    data: { userId, otp }
+  });
+  return otp;
+}
     //access user id from the req.user from the auth.middleware
     const { userId } = (req as any).user || {};
 
@@ -135,3 +287,4 @@ const verifyOTP = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 export { createOTP, verifyOTP };
+*/

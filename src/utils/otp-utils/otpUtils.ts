@@ -2,7 +2,7 @@
 
 import bcrypt from "bcryptjs";
 import { response, Response } from "express";
-import { otpData } from "./otpDataGenerator";
+//import { otpData } from "./otpDataGenerator";
 import { sendError } from "../response";
 import poolConfig from "@/db";
 // Hash the OTP
@@ -14,15 +14,6 @@ const deleteOtp = async (userId: any) => {
   await poolConfig.query("DELETE FROM otp_data WHERE user_id = $1", [userId]);
   console.log("otp has been deleted");
 };
-//Generate Otp
-const generateOTP = (length: number): string => {
-  let otp = "";
-  for (let i = 0; i < length; i++) {
-    const digit = Math.floor(Math.random() * 10);
-    otp += digit.toString();
-  }
-  return otp;
-};
 
 // Get OTP expiry timestamp
 const getOTPExpiry = (minutes: number): Date => {
@@ -33,7 +24,7 @@ const getOTPExpiry = (minutes: number): Date => {
 const compareOtp = async (otp: string, hashedOtp: string) => {
   return await bcrypt.compare(otp, hashedOtp);
 };
-
+/*
 //Check if OTP is expired or not
 const now = Date.now();
 const isExpired = async (
@@ -44,5 +35,5 @@ const isExpired = async (
   if (now > expiration) {
     sendError(res, "OTP expired", 404);
   }
-};
-export { hashOTP, deleteOtp, generateOTP, getOTPExpiry, compareOtp, isExpired };
+};*/
+export { hashOTP, deleteOtp, getOTPExpiry, compareOtp };

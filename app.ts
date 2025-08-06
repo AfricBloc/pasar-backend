@@ -10,26 +10,25 @@ import errorMiddleware from "./src/middleware/error.middleware";
 import createUserTable from "./src/data/createUserTable";
 import authRouter from "./src/router/auth.router";
 import { sendOTPEmail } from "./src/utils/mailer/sendOTP";
-import { generatedOTP } from "./src/middleware";
-import { otpData } from "./src/utils/otp-utils/otpDataGenerator";
-import createOtpTable from "@/data/createOtpTable";
 import cookieParser from "cookie-parser";
+import { globalLimiter } from "@/middleware/rateLimit.middleware";
 
 const app = express();
 
 //Global Middleware
 app.use(express.json());
+app.set("trust proxy", 1);
 //app.use(cors())
 app.use(cookieParser());
+app.use(globalLimiter); //Rate limiter more rateLimiter would be added at production nginx, crowdsec, fail2ban and modsecurity and owsap
 
 //Error handling middleware
 //app.use(errorMiddleware);
 
-//Autocreate Tables
+//Autocreate Tables This would no longer be need cuz we are going to be using prisma
 createUserTable();
-createOtpTable();
+//createOtpTable();
 
-// Call to generate OTP data
 //API Routes
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/auth", authRouter);

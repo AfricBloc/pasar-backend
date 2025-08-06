@@ -1,7 +1,7 @@
 import { sendError } from "@/utils/response";
 import { NextFunction, Response, Request } from "express";
 import jwt, { Secret, JwtPayload } from "jsonwebtoken";
-import { JWT_SECRET } from "@/config/env";
+import { JWT_SECRET } from "@/config/env.config";
 import { sanitizer } from "@/utils/sanitizer/sanitizeUser";
 
 // Extend the Request type to include a user property
