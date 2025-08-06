@@ -2,6 +2,7 @@
 //MAIN SERVER IS THE SERVER.TS
 
 import express from "express";
+import bodyParser from "body-parser";
 //import dotenv from "dotenv";
 //dotenv.config();
 //Created a new file for env variable inside the config folder so just add your .env.development.local
@@ -18,6 +19,8 @@ const app = express();
 //Global Middleware
 app.use(express.json());
 app.set("trust proxy", 1);
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 //app.use(cors())
 app.use(cookieParser());
 app.use(globalLimiter); //Rate limiter more rateLimiter would be added at production nginx, crowdsec, fail2ban and modsecurity and owsap

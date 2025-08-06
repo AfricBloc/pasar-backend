@@ -9,6 +9,7 @@ import {
 import authMiddleware from "@/middleware/auth.middleware";
 import {
   createOtp,
+  resendOtp,
   verifyOtp,
 } from "@/controller/authControllers.ts/otp.controller";
 import {
@@ -22,13 +23,7 @@ authRouter.post("/signup", validate(createUserSchema), createUser);
 authRouter.post("/signin", signIn);
 authRouter.post("/otp", authMiddleware, createOtp);
 authRouter.post("/otp/verify", authMiddleware, verifyOtp);
-authRouter.post(
-  "/otp/resend",
-  authMiddleware,
-  (req: Request, res: Response) => {
-    res.send("signout");
-  }
-);
+authRouter.post("/otp/resend", authMiddleware, resendOtp);
 authRouter.post("/signout", authMiddleware, (req: Request, res: Response) => {
   res.send("signout");
 });

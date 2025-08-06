@@ -1,19 +1,30 @@
-import { Request, Response, NextFunction } from 'express';
-import { ZodSchema } from 'zod';
+import { Request, Response, NextFunction } from "express";
+import { ZodSchema } from "zod";
 
 export const validate =
-  (schema: ZodSchema<any>) =>
-  (req: Request, res: Response, next: NextFunction) => {
-    const result = schema.safeParse(req.body);
+  (schema: ZodSchema) => (req: Request, res: Response, next: NextFunction) => {
+    // Debugging: log the incoming body
+    console.log("Incoming request body:", req.body);
 
-    if (!result.success) {
+    // Check if body exists
+    if (!req.body) {
       return res.status(400).json({
         success: false,
-        errors: result.error.flatten().fieldErrors,
+        error: "Request body is missing",
       });
     }
 
-    // Attach validated data to request object for controller use
+    const result = schema.safeParse(req.body);
+    console.log(result);
+
+    if (!result.success) {
+      console.error("Validation errors:", result.error);
+      return res.status(400).json({
+        success: false,
+        errors: result.error.flatten(), // More detailed than just fieldErrors
+      });
+    }
+
     req.body = result.data;
     next();
   };

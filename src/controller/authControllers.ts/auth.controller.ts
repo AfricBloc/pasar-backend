@@ -2,34 +2,42 @@ import { sendError, sendSuccess } from "../../utils/response/index";
 import { NextFunction, Request, Response } from "express";
 import poolConfig from "../../db/index";
 import bcrypt from "bcryptjs";
-import { JWT_EXPIRES_IN, JWT_SECRET } from "../../config/env.config";
+import { ENV, JWT_EXPIRES_IN, JWT_SECRET } from "../../config/env.config";
 import jwt, { SignOptions, Secret } from "jsonwebtoken";
 import { sanitizer } from "../../utils/sanitizer/sanitizeUser";
-//This function is not yet completed it does generate tokens
-//and also remember to remove the password from the response
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
+//SignUp
 const createUser = async (req: Request, res: Response, next: NextFunction) => {
+  console.log("server signup ");
   let { username, email, password } = req.body;
   const hashPassword = await bcrypt.hash(password, 10);
 
   password = hashPassword;
 
+  if (!username || !email || !password) {
+    return sendError(res, "Incomplete details", 400);
+  }
+  console.log(email, password, username);
   // Check if the user already exists
-  const existingUser = await poolConfig.query(
-    //This would be changed to a prisma and not direct DB query
-    "SELECT * FROM users WHERE email = $1",
-    [email]
-  );
-  if (existingUser.rows.length > 0) {
+  const existingUser = await prisma.user.findUnique({
+    where: {
+      email, // Critical for Citext fields
+    },
+  });
+  console.log("existingUser:", existingUser);
+  if (existingUser) {
     return sendError(res, "User already exists", 400);
   }
 
   try {
-    const result = await poolConfig.query(
-      //This would be changed to a prisma and not direct DB query
-      "INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING *",
-      [username, email, password]
-    );
-    const newUser = result.rows[0];
+    const newUser = await prisma.user.create({
+      data: {
+        username,
+        email,
+        password,
+      },
+    });
 
     const secret = JWT_SECRET as Secret;
     const expiresIn = JWT_EXPIRES_IN as SignOptions["expiresIn"];
@@ -66,26 +74,32 @@ const signIn = async (req: Request, res: Response, next: NextFunction) => {
     return sendError(res, "Email and password are required", 400);
   }
   try {
-    //Validating email
-    const userExist = await poolConfig.query(
-      //This would be changed to a prisma and not direct DB query
-      `SELECT id, username, email, password FROM users WHERE lower(email) = lower($1) LIMIT 1`,
-      [email]
-    );
-    console.log(userExist);
+    // 1. Find user with case-insensitive email match
+    const user = await prisma.user.findFirst({
+      where: {
+        email: {
+          equals: email,
+          mode: "insensitive",
+        },
+      },
+    });
 
-    const result = userExist.rowCount;
-    console.log(result);
-    if (result === 0) {
-      sendError(res, "Invalid credentials", 401);
+    if (!user) {
+      return sendError(res, "Invalid credentials", 401);
     }
-    const user = userExist.rows[0];
 
+    // 3. Handle case where password might be null (OAuth users)
+    if (!user.password) {
+      return res.status(401).json({
+        success: false,
+        error: "Password authentication not available for this user",
+      });
+    }
     //compare password
-    //Please change the user.password to user.password_hash when the createTable code ass been updated
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      sendError(res, "Invalid credentials");
+      return sendError(res, "Invalid credentials");
     }
 
     // 2. Get env vars make sure these exist in .env.development.local
@@ -101,7 +115,7 @@ const signIn = async (req: Request, res: Response, next: NextFunction) => {
     const sanitizedUser = sanitizer(user);
     console.log(sanitizedUser);
     //generate token
-    const token = jwt.sign({ userId: user.id }, secret, { expiresIn });
+    const token = jwt.sign({ userId: user?.id }, secret, { expiresIn });
     sendSuccess(
       res,
       "Signin successful",
@@ -112,13 +126,14 @@ const signIn = async (req: Request, res: Response, next: NextFunction) => {
       200
     );
   } catch (err) {
+    console.log(`Sign in Error ${err}`);
     next(err);
   }
 };
 const logout = (req: Request, res: Response) => {
   res.clearCookie("session", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: ENV === "production",
     sameSite: "lax",
     path: "/", // ensure same path as set
   });

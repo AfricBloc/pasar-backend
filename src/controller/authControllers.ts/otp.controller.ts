@@ -21,14 +21,28 @@ export const createOtp = async (
   next: NextFunction
 ) => {
   try {
-    const { userId, email } = (req as any).user || {};
-    if (!userId || !email) {
-      return sendError(res, "Unauthorized or missing email in token", 401);
+    const { userId } = (req as any).user || {};
+
+    if (!userId) {
+      return sendError(res, "Unauthorized in token", 401);
     }
 
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId, // userId should be a string or number depending on your schema
+      },
+    });
+    console.log("user:", user);
+    if (!user) {
+      return sendError(res, "User not found", 404);
+    }
+    const email = user.email;
+    console.log("email:", email);
     // Rate-limit check
     const resendKey = `otp:resend:${userId}`;
+    console.log("resendKey:", resendKey);
     const count = await redis.incr(resendKey);
+    console.log(count);
     if (count === 1) {
       await redis.expire(resendKey, RESEND_TTL);
     }
@@ -42,19 +56,24 @@ export const createOtp = async (
     // Store hashed OTP in Redis
     await redis.set(`otp:${userId}`, hashedOtp, "EX", OTP_TTL);
 
-    // Persist in Postgres via Prisma
+    /* // Persist in Postgres via Prisma
     const record = await prisma.otpData.create({
       data: {
         userId,
         otpHash: hashedOtp,
         expiresAt: expiry,
       },
-    });
+    });*/
 
     // TODO: send `otp` via email/SMS
     await sendOTPEmail(email, otp);
 
-    return sendSuccess(res, "OTP created and sent", { otpId: record.id }, 201);
+    return sendSuccess(
+      res,
+      "OTP created and sent",
+      { otpId: otp, expiry: expiry },
+      201
+    );
   } catch (err) {
     console.error("Error in createOtp:", err);
     next(err);
@@ -95,17 +114,19 @@ export const verifyOtp = async (
 
     // 1. Fetch the stored hash from Redis (this also handles the 5-min TTL)
     const storedHash = await redis.get(`otp:${userId}`);
+    console.log("storedHash:", storedHash);
     if (!storedHash) {
       return sendError(res, "OTP expired or not found", 400);
     }
 
     // 2. Compare incoming OTP
     const incomingHash = crypto.createHash("sha256").update(otp).digest("hex");
+    console.log("incomingHash:", incomingHash);
     if (incomingHash !== storedHash) {
       return sendError(res, "Incorrect OTP", 400);
     }
 
-    // 3. Fetch the corresponding DB record to check expiry & used status
+    /*   // 3. Fetch the corresponding DB record to check expiry & used status
     const otpRecord = await prisma.otpData.findFirst({
       where: {
         userId,
@@ -127,7 +148,7 @@ export const verifyOtp = async (
     await prisma.otpData.update({
       where: { id: otpRecord.id },
       data: { used: true },
-    });
+    });*/
 
     // 5. Cleanup Redis
     await redis.del(`otp:${userId}`);

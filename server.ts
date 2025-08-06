@@ -1,5 +1,6 @@
 //THIS IS THE MAIN SERVER
 
+import testRedisConnection from "@/db/redis";
 import app from "./app";
 import { PORT, ENV } from "./src/config/env.config";
 import { verifyDBConnection } from "./src/db";
@@ -9,4 +10,5 @@ app.listen(PORT, async () => {
   console.log(`Environment: ${ENV}`);
 
   await verifyDBConnection();
+  await testRedisConnection();
 });
