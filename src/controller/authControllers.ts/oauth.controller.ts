@@ -1,10 +1,10 @@
 import { OAuth2Client } from "google-auth-library";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import { GOOGLE_CLIENT_ID, JWT_SECRET, NODE_ENV } from "@/config/env.config";
+import { GOOGLE_CLIENT_ID, JWT_SECRET, ENV } from "@/config/env.config";
 import { Request, Response } from "express";
 import { getGoogleAuthURL, getToken } from "@/utils/authUtils/oauths";
-import { sendError } from "@/middleware";
+import { sendError } from "@/utils/response";
 import { sendSuccess } from "@/utils/response";
 import poolConfig from "@/db";
 
@@ -28,7 +28,7 @@ export const redirectToGoogle = (req: Request, res: Response) => {
   res.cookie("oauth_state", state, {
     httpOnly: true,
     sameSite: "lax",
-    secure: NODE_ENV === "production",
+    secure: ENV === "production",
     maxAge: 5 * 60 * 1000, // (5 minutes)
   });
 
@@ -154,7 +154,7 @@ export const googleCallback = async (req: Request, res: Response) => {
     // Secure session cookie
     res.cookie("session", appToken, {
       httpOnly: true,
-      secure: NODE_ENV === "production",
+      secure: ENV === "production",
       sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });

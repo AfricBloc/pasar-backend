@@ -8,8 +8,8 @@ import {
 } from "../controller/authControllers.ts/auth.controller";
 import authMiddleware from "@/middleware/auth.middleware";
 import {
-  createOTP,
-  verifyOTP,
+  createOtp,
+  verifyOtp,
 } from "@/controller/authControllers.ts/otp.controller";
 import {
   googleCallback,
@@ -20,8 +20,8 @@ const authRouter = Router();
 
 authRouter.post("/signup", validate(createUserSchema), createUser);
 authRouter.post("/signin", signIn);
-authRouter.post("/otp", authMiddleware, createOTP);
-authRouter.post("/otp/verify", authMiddleware, verifyOTP);
+authRouter.post("/otp", authMiddleware, createOtp);
+authRouter.post("/otp/verify", authMiddleware, verifyOtp);
 authRouter.post(
   "/otp/resend",
   authMiddleware,
