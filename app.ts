@@ -13,6 +13,10 @@ import authRouter from "./src/router/auth.router";
 import { sendOTPEmail } from "./src/utils/mailer/sendOTP";
 import cookieParser from "cookie-parser";
 import { globalLimiter } from "@/middleware/rateLimit.middleware";
+import {
+  createIPReputation,
+  createRateLimiter,
+} from "@/middleware/security.middleware";
 
 const app = express();
 
@@ -21,6 +25,23 @@ app.use(express.json());
 app.set("trust proxy", 1);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(
+  //Global Rate Limiter (all routes)
+  createRateLimiter({
+    points: 50, // 200 requests...
+    duration: 60, // per 60 seconds
+    keyPrefix: "rl_global",
+  })
+);
+const staticBlacklist = new Set<string>(["1.2.3.4", "5.6.7.8"]);
+app.use(
+  //  IP Reputation (block known bad IPs)
+  createIPReputation({
+    abuseKey: process.env.ABUSEIPDB_KEY!,
+    blacklist: staticBlacklist,
+    cacheTTL: 3600, // cache for 1h
+  })
+);
 //app.use(cors())
 app.use(cookieParser());
 app.use(globalLimiter); //Rate limiter more rateLimiter would be added at production nginx, crowdsec, fail2ban and modsecurity and owsap
