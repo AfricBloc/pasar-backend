@@ -51,7 +51,6 @@ export function createRateLimiter(opts: RateLimiterOptions) {
     duration: opts.duration,
     keyPrefix: opts.keyPrefix,
   });
-
   return async function rateLimiter(
     req: Request,
     res: Response,
@@ -59,10 +58,13 @@ export function createRateLimiter(opts: RateLimiterOptions) {
   ) {
     try {
       // use IP or user identifier if authenticated
+
       const customReq = req as CustomRequest;
       const key = (customReq.user?.id ?? req.ip ?? "unknown") as string;
       await limiter.consume(key);
-      console.log("RateLimit READY");
+      // console.log("RateLimit READY");
+      //console.log(req.ip);
+
       next();
     } catch (_err) {
       res.setHeader("Retry-After", String(opts.duration));
@@ -86,14 +88,15 @@ export function createLockoutChecker(opts: LockoutOptions) {
   ) {
     const key = `${opts.prefix}:${req.ip}`;
     console.log("key:", key);
-    const locked = await redisClient.ttl(key);
+    const locked: number = await redisClient.ttl(key);
     console.log("locked:", locked);
     if (locked > 0) {
-      return res
-        .status(403)
-        .json({ error: `Locked. Try again in ${locked} seconds` });
+      return res.status(403).json({
+        status: "locked",
+        message: `Locked. Try again in ${locked} seconds`,
+      });
     }
-    console.log("CREATELOCKOUTCHECKER READY");
+    // console.log("CREATELOCKOUTCHECKER READY");
 
     next();
   };
@@ -105,9 +108,12 @@ export function createLockoutTracker(opts: LockoutOptions) {
     res: Response,
     next: NextFunction
   ) {
-    const ip = req.ip === "::1" ? "127.0.0.1" : req.ip;
+    const ip = req.ip;
+
     const failKey = `${opts.prefix}:fail:${ip}`;
     const lockKey = `${opts.prefix}:${ip}`;
+    console.log("failKey:", failKey);
+    console.log("lockKey:", lockKey);
 
     // Increment the failure count
     const failures = await redisClient.incr(failKey);

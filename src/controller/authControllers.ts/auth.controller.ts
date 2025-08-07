@@ -71,7 +71,7 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
 const signIn = async (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    return sendError(res, "Email and password are required", 400);
+    throw new Error("AuthFailed"); // Throw instead of sendError
   }
   try {
     // 1. Find user with case-insensitive email match
@@ -90,16 +90,13 @@ const signIn = async (req: Request, res: Response, next: NextFunction) => {
 
     // 3. Handle case where password might be null (OAuth users)
     if (!user.password) {
-      return res.status(401).json({
-        success: false,
-        error: "Password authentication not available for this user",
-      });
+      throw new Error("AuthFailed"); // Throw instead of sendError
     }
     //compare password
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return sendError(res, "Invalid credentials");
+      throw new Error("AuthFailed"); // Throw instead of sendError
     }
 
     // 2. Get env vars make sure these exist in .env.development.local
@@ -116,6 +113,7 @@ const signIn = async (req: Request, res: Response, next: NextFunction) => {
     console.log(sanitizedUser);
     //generate token
     const token = jwt.sign({ userId: user?.id }, secret, { expiresIn });
+    console.log("calling next function");
     sendSuccess(
       res,
       "Signin successful",

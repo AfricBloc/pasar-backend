@@ -12,23 +12,23 @@ import createUserTable from "./src/data/createUserTable";
 import authRouter from "./src/router/auth.router";
 import { sendOTPEmail } from "./src/utils/mailer/sendOTP";
 import cookieParser from "cookie-parser";
-import { globalLimiter } from "@/middleware/rateLimit.middleware";
 import {
   createIPReputation,
   createRateLimiter,
 } from "@/middleware/security.middleware";
-
+import arcjetMiddleware from "@/middleware/arcjet.middleware";
 const app = express();
 
 //Global Middleware
 app.use(express.json());
-app.set("trust proxy", 1);
+app.set("trust proxy", true); //Cus we would be using nginx
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(arcjetMiddleware);
 app.use(
   //Global Rate Limiter (all routes)
   createRateLimiter({
-    points: 50, // 200 requests...
+    points: 50, // 50 requests...
     duration: 60, // per 60 seconds
     keyPrefix: "rl_global",
   })
@@ -44,7 +44,7 @@ app.use(
 );
 //app.use(cors())
 app.use(cookieParser());
-app.use(globalLimiter); //Rate limiter more rateLimiter would be added at production nginx, crowdsec, fail2ban and modsecurity and owsap
+//Rate limiter more rateLimiter would be added at production nginx, crowdsec, fail2ban and modsecurity and owsap
 
 //Error handling middleware
 //app.use(errorMiddleware);

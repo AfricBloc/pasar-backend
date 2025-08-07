@@ -62,15 +62,17 @@ export const signInHandler = async (
   res: Response,
   next: NextFunction
 ) => {
+  console.log("sign in handler ready");
   try {
     await signIn(req, res, next); // your existing login logic
-
+    console.log("sign in");
     // ✅ Step 5: Clear lockout/backoff data on success
     await Promise.all([
       redisClient.del(`lock:signin:${req.ip}`),
       redisClient.del(`backoff:signin:${req.ip}`),
     ]);
   } catch (err: any) {
+    console.log("error:", err);
     return next(err); // pass to error handler
   }
 };
@@ -82,6 +84,7 @@ export const signInErrorHandler = (
   next: NextFunction
 ) => {
   if (err.message === "AuthFailed") {
+    console.log("signup error handler");
     createLockoutTracker({
       maxFailed: 5,
       lockDuration: 15 * 60,

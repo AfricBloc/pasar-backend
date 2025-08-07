@@ -24,6 +24,8 @@
     "schema": "src/prisma/schema.prisma"
   },
   "dependencies": {
+    "@arcjet/inspect": "^1.0.0-beta.10",
+    "@arcjet/node": "^1.0.0-beta.10",
     "@prisma/client": "^6.13.0",
     "@types/express-rate-limit": "^5.1.3",
     "@types/redis": "^4.0.10",
