@@ -3,8 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const arcjet_config_1 = __importDefault(require("../../config/arcjet.config"));
-const response_1 = require("../../utils/response");
+const arcjet_config_1 = __importDefault(require("../config/arcjet.config"));
+const response_1 = require("../utils/response");
 const arcjetMiddleware = async (req, res, next) => {
     try {
         const decision = await arcjet_config_1.default.protect(req, { requested: 5 }); // Deduct 5 tokens from the bucket

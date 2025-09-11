@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.otpBackoffOpts = exports.otpLockOpts = exports.signInErrorHandler = exports.signInHandler = exports.geoJump = exports.lockoutChecker = exports.lockOffOpts = exports.signInBackOffOpts = exports.signupBackOffOpts = exports.limitOpts = void 0;
-const auth_controller_1 = require("../../../controller/authControllers.ts/auth.controller");
+const auth_controller_1 = require("../../controller/authControllers.ts/auth.controller");
 const redis_1 = require("../redisClient/redis");
-const security_middleware_1 = require("../../../middleware/security.middleware");
+const security_middleware_1 = require("../../middleware/security.middleware");
 const redisClient = redis_1.redis;
 // For createRateLimiter
 exports.limitOpts = { points: 5, duration: 60, keyPrefix: "rl:signup" };

@@ -6,10 +6,10 @@ import bodyParser from "body-parser";
 //import dotenv from "dotenv";
 //dotenv.config();
 //Created a new file for env variable inside the config folder so just add your .env.development.local
-import userRouter from "./src/router/user.router";
+import userRouter from "./router/user.router";
 //import errorMiddleware from "./src/middleware/error.middleware";
 //import createUserTable from "./src/data/createUserTable";
-import authRouter from "./src/router/auth.router";
+import authRouter from "./router/auth.router";
 //import { sendOTPEmail } from "./src/utils/mailer/sendOTP";
 import cookieParser from "cookie-parser";
 import {

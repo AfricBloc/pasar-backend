@@ -7,11 +7,11 @@ const express_1 = require("express");
 const validator_middleware_1 = require("../middleware/validator.middleware");
 const user_model_1 = require("../model/user.model");
 const auth_controller_1 = require("../controller/authControllers.ts/auth.controller");
-const auth_middleware_1 = __importDefault(require("../../middleware/auth.middleware"));
-const otp_controller_1 = require("../../controller/authControllers.ts/otp.controller");
-const oauth_controller_1 = require("../../controller/authControllers.ts/oauth.controller");
-const security_middleware_1 = require("../../middleware/security.middleware");
-const auths_1 = require("../../utils/authUtils/auths");
+const auth_middleware_1 = __importDefault(require("../middleware/auth.middleware"));
+const otp_controller_1 = require("../controller/authControllers.ts/otp.controller");
+const oauth_controller_1 = require("../controller/authControllers.ts/oauth.controller");
+const security_middleware_1 = require("../middleware/security.middleware");
+const auths_1 = require("../utils/authUtils/auths");
 const authRouter = (0, express_1.Router)();
 // ── Apply a per-router rate limit to all /auth/* endpoints ───────────────────────
 authRouter.use((0, security_middleware_1.createRateLimiter)({
@@ -66,16 +66,16 @@ import {
   createUser,
   signIn,
 } from "../controller/authControllers.ts/auth.controller";
-import authMiddleware from "../../middleware/auth.middleware";
+import authMiddleware from "../middleware/auth.middleware";
 import {
   createOtp,
   resendOtp,
   verifyOtp,
-} from "../../controller/authControllers.ts/otp.controller";
+} from "../controller/authControllers.ts/otp.controller";
 import {
   googleCallback,
   redirectToGoogle,
-} from "../../controller/authControllers.ts/oauth.controller";
+} from "../controller/authControllers.ts/oauth.controller";
 import {
   createRateLimiter,
   createLockoutChecker,
@@ -84,7 +84,7 @@ import {
   createBackoffTracker,
   createIPReputation,
   createGeoJump,
-} from "../../middleware/security.middleware";
+} from "../middleware/security.middleware";
 
 const authRouter = Router();
 // Apply rate limiter to ALL /auth/* routes

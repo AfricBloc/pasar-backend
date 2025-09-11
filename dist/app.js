@@ -10,14 +10,14 @@ const body_parser_1 = __importDefault(require("body-parser"));
 //import dotenv from "dotenv";
 //dotenv.config();
 //Created a new file for env variable inside the config folder so just add your .env.development.local
-const user_router_1 = __importDefault(require("./src/router/user.router"));
+const user_router_1 = __importDefault(require("./router/user.router"));
 //import errorMiddleware from "./src/middleware/error.middleware";
 //import createUserTable from "./src/data/createUserTable";
-const auth_router_1 = __importDefault(require("./src/router/auth.router"));
+const auth_router_1 = __importDefault(require("./router/auth.router"));
 //import { sendOTPEmail } from "./src/utils/mailer/sendOTP";
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
-const security_middleware_1 = require("@/middleware/security.middleware");
-const arcjet_middleware_1 = __importDefault(require("@/middleware/arcjet.middleware"));
+const security_middleware_1 = require("./middleware/security.middleware");
+const arcjet_middleware_1 = __importDefault(require("./middleware/arcjet.middleware"));
 const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
 //Global Middleware

@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.redis = exports.redisUrl = void 0;
 // src/lib/redis.ts
 const ioredis_1 = __importDefault(require("ioredis"));
-const env_config_1 = require("../../../config/env.config");
+const env_config_1 = require("../../config/env.config");
 exports.redisUrl = env_config_1.REDIS_URI;
 //console.log("Redis URL:", redisUrl);
 exports.redis = exports.redisUrl
