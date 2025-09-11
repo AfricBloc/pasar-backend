@@ -31,7 +31,7 @@ export const {
   REDIRECT_URL,
   REDIS_HOST,
   REDIS_PORT,
-  REDIS_PASSWORD,
+  REDIS_URI,
   ARCJET_KEY,
   ARCJET_ENV,
 } = process.env;

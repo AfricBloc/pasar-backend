@@ -9,7 +9,7 @@ import { RateLimiterRedis } from "rate-limiter-flexible";
 import Redis from "ioredis";
 import geoip from "geoip-lite";
 import fetch from "node-fetch";
-import { redisUrl } from "@/utils/redisClient/redis";
+import { redis, redisUrl } from "@/utils/redisClient/redis";
 import { sendError } from "@/utils/response";
 
 interface CustomRequest extends Request {
@@ -25,7 +25,7 @@ interface AbuseIPDBResponse {
   };
 }
 // ---------- Shared Redis Client ----------
-const redisClient = new Redis(redisUrl); //redis url inside utils
+const redisClient = redis; //redis url inside utils
 
 redisClient.on("connect", () => {
   console.log("Redis client is connecting...");

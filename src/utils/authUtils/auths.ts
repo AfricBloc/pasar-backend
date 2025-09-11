@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 import { signIn } from "@/controller/authControllers.ts/auth.controller";
 import Redis from "ioredis";
-import { redisUrl } from "../redisClient/redis";
+import { redis } from "../redisClient/redis";
 import {
   createBackoffTracker,
   createLockoutTracker,
 } from "@/middleware/security.middleware";
 
-const redisClient = new Redis(redisUrl);
+const redisClient = redis;
 
 // For createRateLimiter
 export const limitOpts = { points: 5, duration: 60, keyPrefix: "rl:signup" };

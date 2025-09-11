@@ -1,10 +1,12 @@
 import { createClient } from "redis";
-import Redis from "ioredis";
-import { REDIS_HOST, REDIS_PORT } from "@/config/env.config";
+//import Redis from "ioredis";
+//import { REDIS_HOST, REDIS_PORT, REDIS_URI } from "@/config/env.config";
+import { redisUrl } from "@/utils/redisClient/redis";
 
 const client = createClient({
-  url: `redis://${REDIS_HOST}:${REDIS_PORT}`,
+  url: redisUrl,
 });
+
 const testRedisConnection = async () => {
   try {
     await client.connect();

@@ -50,7 +50,7 @@ app.use(cookieParser());
 //app.use(errorMiddleware);
 
 //Autocreate Tables This would no longer be need cuz we are going to be using prisma
-createUserTable();
+//createUserTable();
 //createOtpTable();
 
 //API Routes
