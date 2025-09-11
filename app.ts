@@ -58,6 +58,10 @@ app.use(cookieParser());
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/auth", authRouter);
 
+app.get("/api/hello", (req, res) => {
+  res.json({ message: "Hello from Express backend!" });
+});
+
 export default app;
 function notImplementedCors(): any {
   throw new Error("Function not implemented.");
