@@ -11,7 +11,10 @@ const body_parser_1 = __importDefault(require("body-parser"));
 //dotenv.config();
 //Created a new file for env variable inside the config folder so just add your .env.development.local
 const user_router_1 = __importDefault(require("./src/router/user.router"));
+//import errorMiddleware from "./src/middleware/error.middleware";
+//import createUserTable from "./src/data/createUserTable";
 const auth_router_1 = __importDefault(require("./src/router/auth.router"));
+//import { sendOTPEmail } from "./src/utils/mailer/sendOTP";
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const security_middleware_1 = require("@/middleware/security.middleware");
 const arcjet_middleware_1 = __importDefault(require("@/middleware/arcjet.middleware"));
@@ -49,6 +52,9 @@ app.use((0, cookie_parser_1.default)());
 //API Routes
 app.use("/api/v1/users", user_router_1.default);
 app.use("/api/v1/auth", auth_router_1.default);
+app.get("/api/hello", (req, res) => {
+    res.json({ message: "Hello from Express backend!" });
+});
 exports.default = app;
 function notImplementedCors() {
     throw new Error("Function not implemented.");
