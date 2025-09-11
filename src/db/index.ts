@@ -2,6 +2,7 @@ import pkg from "pg";
 import { DATABASE_URL } from "../config/env.config";
 const { Pool } = pkg;
 
+console.log("Database URL:", DATABASE_URL);
 const poolConfig = new Pool({
   //connectionString: process.env.DATABASE_URL,
   connectionString: DATABASE_URL,

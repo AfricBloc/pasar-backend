@@ -17,6 +17,7 @@ import {
   createRateLimiter,
 } from "@/middleware/security.middleware";
 import arcjetMiddleware from "@/middleware/arcjet.middleware";
+import cors from "cors";
 const app = express();
 
 //Global Middleware
@@ -42,7 +43,7 @@ app.use(
     cacheTTL: 3600, // cache for 1h
   })
 );
-//app.use(cors())
+app.use(cors({ origin: "http://localhost:3000", credentials: true })); // Adjust origin as needed
 app.use(cookieParser());
 //Rate limiter more rateLimiter would be added at production nginx, crowdsec, fail2ban and modsecurity and owsap
 
@@ -58,3 +59,6 @@ app.use("/api/v1/users", userRouter);
 app.use("/api/v1/auth", authRouter);
 
 export default app;
+function notImplementedCors(): any {
+  throw new Error("Function not implemented.");
+}
