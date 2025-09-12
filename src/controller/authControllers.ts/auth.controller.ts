@@ -52,6 +52,18 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
 
     //generate token
     const token = jwt.sign({ userId: newUser.id }, secret, { expiresIn });
+
+    // Set HTTP-only cookie with the token
+    // Use secure in production and sameSite lax to prevent CSRF
+    res.cookie("session", token, {
+      httpOnly: true,
+      secure: ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      // set a reasonable maxAge (24 hours); adjust as needed
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
     sendSuccess(
       res,
       "Signin successful",
@@ -114,6 +126,16 @@ const signIn = async (req: Request, res: Response, next: NextFunction) => {
     //generate token
     const token = jwt.sign({ userId: user?.id }, secret, { expiresIn });
     console.log("calling next function");
+
+    // Set HTTP-only cookie with the token
+    res.cookie("session", token, {
+      httpOnly: true,
+      secure: ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
     sendSuccess(
       res,
       "Signin successful",
@@ -137,4 +159,4 @@ const logout = (req: Request, res: Response) => {
   });
   res.status(200).json({ message: "Logged out" });
 };
-export { createUser, signIn };
+export { createUser, signIn, logout };
