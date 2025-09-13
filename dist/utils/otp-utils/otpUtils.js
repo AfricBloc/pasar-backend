@@ -6,7 +6,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.compareOtp = exports.getOTPExpiry = exports.deleteOtp = exports.hashOTP = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const db_1 = __importDefault(require("@/db"));
+const db_1 = __importDefault(require("../../db"));
 // Hash the OTP
 const hashOTP = async (otp) => {
     const saltRounds = 10;

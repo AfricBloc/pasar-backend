@@ -3,9 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const response_1 = require("@/utils/response");
+const response_1 = require("../utils/response");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const env_config_1 = require("@/config/env.config");
+const env_config_1 = require("../config/env.config");
 const authMiddleware = async (req, res, next) => {
     // Only extract token from httpOnly cookie named 'session'
     const token = req.cookies?.session;

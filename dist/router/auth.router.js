@@ -7,31 +7,13 @@ const express_1 = require("express");
 const validator_middleware_1 = require("../middleware/validator.middleware");
 const user_model_1 = require("../model/user.model");
 const auth_controller_1 = require("../controller/authControllers.ts/auth.controller");
-const auth_middleware_1 = __importDefault(require("@/middleware/auth.middleware"));
+const auth_middleware_1 = __importDefault(require("../middleware/auth.middleware"));
 const client_1 = require("@prisma/client");
-const sanitizeUser_1 = require("@/utils/sanitizer/sanitizeUser");
-// ── AUTH ME (check if user is authenticated via httpOnly cookie) ──────────────
-const prisma = new client_1.PrismaClient();
-authRouter.get("/me", auth_middleware_1.default, async (req, res) => {
-    try {
-        if (!req.user || !req.user.userId) {
-            return res.status(401).json({ message: "Not authenticated" });
-        }
-        // Fetch user from DB for fresh info
-        const user = await prisma.user.findUnique({ where: { id: req.user.userId } });
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-        return res.status(200).json({ user: (0, sanitizeUser_1.sanitizer)(user) });
-    }
-    catch (err) {
-        return res.status(500).json({ message: "Server error" });
-    }
-});
-const otp_controller_1 = require("@/controller/authControllers.ts/otp.controller");
-const oauth_controller_1 = require("@/controller/authControllers.ts/oauth.controller");
-const security_middleware_1 = require("@/middleware/security.middleware");
-const auths_1 = require("@/utils/authUtils/auths");
+const sanitizeUser_1 = require("../utils/sanitizer/sanitizeUser");
+const otp_controller_1 = require("../controller/authControllers.ts/otp.controller");
+const oauth_controller_1 = require("../controller/authControllers.ts/oauth.controller");
+const security_middleware_1 = require("../middleware/security.middleware");
+const auths_1 = require("../utils/authUtils/auths");
 const authRouter = (0, express_1.Router)();
 // ── Apply a per-router rate limit to all /auth/* endpoints ───────────────────────
 authRouter.use((0, security_middleware_1.createRateLimiter)({
@@ -63,6 +45,26 @@ authRouter.post("/signin",
 auths_1.signInHandler, 
 // Track failure *only if signIn throws "AuthFailed"*
 auths_1.signInErrorHandler);
+// ── AUTH ME (check if user is authenticated via httpOnly cookie) ──────────────
+const prisma = new client_1.PrismaClient();
+authRouter.get("/me", auth_middleware_1.default, async (req, res) => {
+    try {
+        if (!req.user || !req.user.userId) {
+            return res.status(401).json({ message: "Not authenticated" });
+        }
+        // Fetch user from DB for fresh info
+        const user = await prisma.user.findUnique({
+            where: { id: req.user.userId },
+        });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        return res.status(200).json({ user: (0, sanitizeUser_1.sanitizer)(user) });
+    }
+    catch (err) {
+        return res.status(500).json({ message: "Server error" });
+    }
+});
 // ── OTP ROUTES (protected by authMiddleware) ───────────────────────────────────
 // generate OTP
 authRouter.get("/otp", auth_middleware_1.default, (0, security_middleware_1.createLockoutChecker)(auths_1.otpLockOpts), (0, security_middleware_1.createBackoff)(auths_1.otpBackoffOpts), otp_controller_1.createOtp);
@@ -86,16 +88,16 @@ import {
   createUser,
   signIn,
 } from "../controller/authControllers.ts/auth.controller";
-import authMiddleware from "@/middleware/auth.middleware";
+import authMiddleware from "../middleware/auth.middleware";
 import {
   createOtp,
   resendOtp,
   verifyOtp,
-} from "@/controller/authControllers.ts/otp.controller";
+} from "../controller/authControllers.ts/otp.controller";
 import {
   googleCallback,
   redirectToGoogle,
-} from "@/controller/authControllers.ts/oauth.controller";
+} from "../controller/authControllers.ts/oauth.controller";
 import {
   createRateLimiter,
   createLockoutChecker,
@@ -104,7 +106,7 @@ import {
   createBackoffTracker,
   createIPReputation,
   createGeoJump,
-} from "@/middleware/security.middleware";
+} from "../middleware/security.middleware";
 
 const authRouter = Router();
 // Apply rate limiter to ALL /auth/* routes

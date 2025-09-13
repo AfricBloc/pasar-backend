@@ -16,8 +16,8 @@ const user_router_1 = __importDefault(require("./router/user.router"));
 const auth_router_1 = __importDefault(require("./router/auth.router"));
 //import { sendOTPEmail } from "./src/utils/mailer/sendOTP";
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
-const security_middleware_1 = require("@/middleware/security.middleware");
-const arcjet_middleware_1 = __importDefault(require("@/middleware/arcjet.middleware"));
+const security_middleware_1 = require("./middleware/security.middleware");
+const arcjet_middleware_1 = __importDefault(require("./middleware/arcjet.middleware"));
 const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
 //Global Middleware

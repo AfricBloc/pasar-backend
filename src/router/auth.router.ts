@@ -8,25 +8,7 @@ import {
 import authMiddleware from "@/middleware/auth.middleware";
 import { PrismaClient } from "@prisma/client";
 import { sanitizer } from "@/utils/sanitizer/sanitizeUser";
-// ── AUTH ME (check if user is authenticated via httpOnly cookie) ──────────────
-const prisma = new PrismaClient();
-authRouter.get("/me", authMiddleware, async (req: any, res: Response) => {
-  try {
-    if (!req.user || !req.user.userId) {
-      return res.status(401).json({ message: "Not authenticated" });
-    }
-    // Fetch user from DB for fresh info
-    const user = await prisma.user.findUnique({
-      where: { id: req.user.userId },
-    });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    return res.status(200).json({ user: sanitizer(user) });
-  } catch (err) {
-    return res.status(500).json({ message: "Server error" });
-  }
-});
+
 import {
   createOtp,
   resendOtp,
@@ -98,7 +80,25 @@ authRouter.post(
   // Track failure *only if signIn throws "AuthFailed"*
   signInErrorHandler
 );
-
+// ── AUTH ME (check if user is authenticated via httpOnly cookie) ──────────────
+const prisma = new PrismaClient();
+authRouter.get("/me", authMiddleware, async (req: any, res: Response) => {
+  try {
+    if (!req.user || !req.user.userId) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+    // Fetch user from DB for fresh info
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.userId },
+    });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res.status(200).json({ user: sanitizer(user) });
+  } catch (err) {
+    return res.status(500).json({ message: "Server error" });
+  }
+});
 // ── OTP ROUTES (protected by authMiddleware) ───────────────────────────────────
 // generate OTP
 authRouter.get(
