@@ -23,6 +23,7 @@ const app = express();
 //Global Middleware
 app.use(express.json());
 app.set("trust proxy", true); //Cus we would be using nginx
+app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(arcjetMiddleware);
@@ -52,7 +53,7 @@ app.use(
     credentials: true,
   })
 ); // Adjust origin as needed
-app.use(cookieParser());
+
 //Rate limiter more rateLimiter would be added at production nginx, crowdsec, fail2ban and modsecurity and owsap
 
 //Error handling middleware
