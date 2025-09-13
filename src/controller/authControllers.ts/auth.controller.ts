@@ -57,8 +57,8 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
     // Use secure in production and sameSite lax to prevent CSRF
     res.cookie("session", token, {
       httpOnly: true,
-      secure: ENV === "production",
-      sameSite: "lax",
+     secure: true, //ENV === "production",
+      sameSite: "none", //"lax",
       path: "/",
       // set a reasonable maxAge (24 hours); adjust as needed
       maxAge: 24 * 60 * 60 * 1000,
@@ -66,7 +66,7 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
 
     sendSuccess(
       res,
-      "Signin successful",
+      "Signup successful",
       {
         token: token,
         user: sanitizedUser, //Sanitize to remove sensitive details like password etc
@@ -130,8 +130,8 @@ const signIn = async (req: Request, res: Response, next: NextFunction) => {
     // Set HTTP-only cookie with the token
     res.cookie("session", token, {
       httpOnly: true,
-      secure: ENV === "production",
-      sameSite: "lax",
+      secure: true, //ENV === "production",
+      sameSite: "none", //"lax",
       path: "/",
       maxAge: 24 * 60 * 60 * 1000,
     });
