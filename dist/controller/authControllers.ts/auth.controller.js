@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.signIn = exports.createUser = void 0;
+exports.logout = exports.signIn = exports.createUser = void 0;
 const index_1 = require("../../utils/response/index");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const env_config_1 = require("../../config/env.config");
@@ -49,6 +49,16 @@ const createUser = async (req, res, next) => {
         console.log(sanitizedUser);
         //generate token
         const token = jsonwebtoken_1.default.sign({ userId: newUser.id }, secret, { expiresIn });
+        // Set HTTP-only cookie with the token
+        // Use secure in production and sameSite lax to prevent CSRF
+        res.cookie("session", token, {
+            httpOnly: true,
+            secure: env_config_1.ENV === "production",
+            sameSite: "lax",
+            path: "/",
+            // set a reasonable maxAge (24 hours); adjust as needed
+            maxAge: 24 * 60 * 60 * 1000,
+        });
         (0, index_1.sendSuccess)(res, "Signin successful", {
             token: token,
             user: sanitizedUser, //Sanitize to remove sensitive details like password etc
@@ -100,6 +110,14 @@ const signIn = async (req, res, next) => {
         //generate token
         const token = jsonwebtoken_1.default.sign({ userId: user?.id }, secret, { expiresIn });
         console.log("calling next function");
+        // Set HTTP-only cookie with the token
+        res.cookie("session", token, {
+            httpOnly: true,
+            secure: env_config_1.ENV === "production",
+            sameSite: "lax",
+            path: "/",
+            maxAge: 24 * 60 * 60 * 1000,
+        });
         (0, index_1.sendSuccess)(res, "Signin successful", {
             token: token,
             user: sanitizedUser, //Sanitize to remove sensitive details like password etc
@@ -120,3 +138,4 @@ const logout = (req, res) => {
     });
     res.status(200).json({ message: "Logged out" });
 };
+exports.logout = logout;

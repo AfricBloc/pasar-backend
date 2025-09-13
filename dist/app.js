@@ -16,8 +16,8 @@ const user_router_1 = __importDefault(require("./router/user.router"));
 const auth_router_1 = __importDefault(require("./router/auth.router"));
 //import { sendOTPEmail } from "./src/utils/mailer/sendOTP";
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
-const security_middleware_1 = require("./middleware/security.middleware");
-const arcjet_middleware_1 = __importDefault(require("./middleware/arcjet.middleware"));
+const security_middleware_1 = require("@/middleware/security.middleware");
+const arcjet_middleware_1 = __importDefault(require("@/middleware/arcjet.middleware"));
 const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
 //Global Middleware
@@ -41,7 +41,13 @@ app.use(
     blacklist: staticBlacklist,
     cacheTTL: 3600, // cache for 1h
 }));
-app.use((0, cors_1.default)({ origin: "http://localhost:3000", credentials: true })); // Adjust origin as needed
+app.use((0, cors_1.default)({
+    origin: [
+        "http://localhost:3000",
+        "https://3000-firebase-pasar-frontend-1754754614515.cluster-lu4mup47g5gm4rtyvhzpwbfadi.cloudworkstations.dev",
+    ],
+    credentials: true,
+})); // Adjust origin as needed
 app.use((0, cookie_parser_1.default)());
 //Rate limiter more rateLimiter would be added at production nginx, crowdsec, fail2ban and modsecurity and owsap
 //Error handling middleware

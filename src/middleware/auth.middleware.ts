@@ -14,16 +14,8 @@ const authMiddleware = async (
   res: Response,
   next: NextFunction
 ) => {
-  let token;
-  // Check if the token is present in the headers
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
-    // Extract the token from the Authorization header
-    token = req.headers.authorization.split(" ")[1];
-  }
-  // If no token is provided, return an error
+  // Only extract token from httpOnly cookie named 'session'
+  const token = req.cookies?.session;
   if (!token) {
     return sendError(
       res,

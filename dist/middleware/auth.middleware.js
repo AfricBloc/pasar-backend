@@ -3,18 +3,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const response_1 = require("../utils/response");
+const response_1 = require("@/utils/response");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const env_config_1 = require("../config/env.config");
+const env_config_1 = require("@/config/env.config");
 const authMiddleware = async (req, res, next) => {
-    let token;
-    // Check if the token is present in the headers
-    if (req.headers.authorization &&
-        req.headers.authorization.startsWith("Bearer")) {
-        // Extract the token from the Authorization header
-        token = req.headers.authorization.split(" ")[1];
-    }
-    // If no token is provided, return an error
+    // Only extract token from httpOnly cookie named 'session'
+    const token = req.cookies?.session;
     if (!token) {
         return (0, response_1.sendError)(res, "You are not authorized to access this resource", 401);
     }

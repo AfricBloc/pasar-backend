@@ -14,8 +14,8 @@ exports.createGeoJump = createGeoJump;
 const rate_limiter_flexible_1 = require("rate-limiter-flexible");
 const geoip_lite_1 = __importDefault(require("geoip-lite"));
 const node_fetch_1 = __importDefault(require("node-fetch"));
-const redis_1 = require("../utils/redisClient/redis");
-const response_1 = require("../utils/response");
+const redis_1 = require("@/utils/redisClient/redis");
+const response_1 = require("@/utils/response");
 // ---------- Shared Redis Client ----------
 const redisClient = redis_1.redis; //redis url inside utils
 redisClient.on("connect", () => {

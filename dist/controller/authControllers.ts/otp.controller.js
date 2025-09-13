@@ -6,10 +6,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyOtp = exports.resendOtp = exports.createOtp = void 0;
 const crypto_1 = __importDefault(require("crypto"));
 const client_1 = require("@prisma/client");
-const redis_1 = require("../../utils/redisClient/redis");
-const response_1 = require("../../utils/response");
-const otpDataGenerator_1 = __importDefault(require("../../utils/otp-utils/otpDataGenerator"));
-const sendOTP_1 = require("../../utils/mailer/sendOTP");
+const redis_1 = require("@/utils/redisClient/redis");
+const response_1 = require("@/utils/response");
+const otpDataGenerator_1 = __importDefault(require("@/utils/otp-utils/otpDataGenerator"));
+const sendOTP_1 = require("@/utils/mailer/sendOTP");
 const prisma = new client_1.PrismaClient();
 const RESEND_TTL = 24 * 3600; // seconds
 const MAX_RESEND = 5; //Number of times a user can resend
@@ -135,12 +135,12 @@ const verifyOtp = async (req, res, next) => {
 };
 exports.verifyOtp = verifyOtp;
 /*import { NextFunction, Request, Response } from "express";
-import { sendSuccess, sendError } from "../../utils/response";
-import poolConfig from "../../db";
-import { generateOTPData, otpData } from "../../utils/otp-utils/otpDataGenerator";
-import { compareOtp, deleteOtp, isExpired } from "../../utils/otp-utils/otpUtils";
+import { sendSuccess, sendError } from "@/utils/response";
+import poolConfig from "@/db";
+import { generateOTPData, otpData } from "@/utils/otp-utils/otpDataGenerator";
+import { compareOtp, deleteOtp, isExpired } from "@/utils/otp-utils/otpUtils";
 import { PrismaClient } from '@prisma/client';
-import { redis } from "../../utils/redisClient/redis"
+import { redis } from "@/utils/redisClient/redis"
 
 const createOTP = async (
   req: Request, // or AuthenticatedRequest if you've extended globally

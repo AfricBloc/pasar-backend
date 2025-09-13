@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getToken = exports.getGoogleAuthURL = void 0;
-const env_config_1 = require("../../config/env.config");
+const env_config_1 = require("@/config/env.config");
 const node_fetch_1 = __importDefault(require("node-fetch"));
 /**
  * Builds the Google OAuth2 authorization URL to which the user is redirected.

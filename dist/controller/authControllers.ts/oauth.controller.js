@@ -7,11 +7,11 @@ exports.googleCallback = exports.redirectToGoogle = void 0;
 const google_auth_library_1 = require("google-auth-library");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const crypto_1 = __importDefault(require("crypto"));
-const env_config_1 = require("../../config/env.config");
-const oauths_1 = require("../../utils/authUtils/oauths");
-const response_1 = require("../../utils/response");
-const response_2 = require("../../utils/response");
-const db_1 = __importDefault(require("../../db"));
+const env_config_1 = require("@/config/env.config");
+const oauths_1 = require("@/utils/authUtils/oauths");
+const response_1 = require("@/utils/response");
+const response_2 = require("@/utils/response");
+const db_1 = __importDefault(require("@/db"));
 //Init Google's verifier client once
 const oauthClient = new google_auth_library_1.OAuth2Client(env_config_1.GOOGLE_CLIENT_ID);
 /**

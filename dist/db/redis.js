@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const redis_1 = require("redis");
 //import Redis from "ioredis";
-//import { REDIS_HOST, REDIS_PORT, REDIS_URI } from "../config/env.config";
-const redis_2 = require("../utils/redisClient/redis");
+//import { REDIS_HOST, REDIS_PORT, REDIS_URI } from "@/config/env.config";
+const redis_2 = require("@/utils/redisClient/redis");
 const client = (0, redis_1.createClient)({
     url: redis_2.redisUrl,
 });
