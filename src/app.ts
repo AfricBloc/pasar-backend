@@ -26,6 +26,15 @@ app.set("trust proxy", true); //Cus we would be using nginx
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://3000-firebase-pasar-frontend-1754754614515.cluster-lu4mup47g5gm4rtyvhzpwbfadi.cloudworkstations.dev",
+    ],
+    credentials: true,
+  })
+); // Adjust origin as needed
 app.use(arcjetMiddleware);
 app.use(
   //Global Rate Limiter (all routes)
@@ -44,15 +53,7 @@ app.use(
     cacheTTL: 3600, // cache for 1h
   })
 );
-app.use(
-  cors({
-    origin: [
-      "http://localhost:3000",
-      "https://3000-firebase-pasar-frontend-1754754614515.cluster-lu4mup47g5gm4rtyvhzpwbfadi.cloudworkstations.dev",
-    ],
-    credentials: true,
-  })
-); // Adjust origin as needed
+
 
 //Rate limiter more rateLimiter would be added at production nginx, crowdsec, fail2ban and modsecurity and owsap
 
