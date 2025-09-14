@@ -57,7 +57,7 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
     // Use secure in production and sameSite lax to prevent CSRF
     res.cookie("session", token, {
       httpOnly: true,
-     secure: true, //ENV === "production",
+     secure: ENV === "production",
       sameSite: "lax",
       path: "/",
       // set a reasonable maxAge (24 hours); adjust as needed
@@ -130,7 +130,7 @@ const signIn = async (req: Request, res: Response, next: NextFunction) => {
     // Set HTTP-only cookie with the token
     res.cookie("session", token, {
       httpOnly: true,
-      secure: true, //ENV === "production",
+      secure: ENV === "production",
       sameSite: "lax",
       path: "/",
       maxAge: 24 * 60 * 60 * 1000,
