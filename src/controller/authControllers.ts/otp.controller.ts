@@ -8,8 +8,8 @@ import { sendOTPEmail } from "@/utils/mailer/sendOTP";
 
 const prisma = new PrismaClient();
 
-const RESEND_TTL = 24 * 3600; // seconds
-const MAX_RESEND = 5; //Number of times a user can resend
+const RESEND_TTL = 60 //24 * 3600; // seconds
+const MAX_RESEND = 10;//5; //Number of times a user can resend
 
 /**
  * POST /api/otp
