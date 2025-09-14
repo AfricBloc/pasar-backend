@@ -58,7 +58,7 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
     res.cookie("session", token, {
       httpOnly: true,
      secure: true, //ENV === "production",
-      sameSite: "none", //"lax",
+      sameSite: "lax",
       path: "/",
       // set a reasonable maxAge (24 hours); adjust as needed
       maxAge: 24 * 60 * 60 * 1000,
@@ -131,7 +131,7 @@ const signIn = async (req: Request, res: Response, next: NextFunction) => {
     res.cookie("session", token, {
       httpOnly: true,
       secure: true, //ENV === "production",
-      sameSite: "none", //"lax",
+      sameSite: "lax",
       path: "/",
       maxAge: 24 * 60 * 60 * 1000,
     });
