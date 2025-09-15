@@ -23,8 +23,16 @@ const app = (0, express_1.default)();
 //Global Middleware
 app.use(express_1.default.json());
 app.set("trust proxy", true); //Cus we would be using nginx
+app.use((0, cookie_parser_1.default)());
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: true }));
+app.use((0, cors_1.default)({
+    origin: [
+        "http://localhost:3000",
+        "https://3000-firebase-pasar-frontend-1754754614515.cluster-lu4mup47g5gm4rtyvhzpwbfadi.cloudworkstations.dev",
+    ],
+    credentials: true,
+})); // Adjust origin as needed
 app.use(arcjet_middleware_1.default);
 app.use(
 //Global Rate Limiter (all routes)
@@ -41,14 +49,6 @@ app.use(
     blacklist: staticBlacklist,
     cacheTTL: 3600, // cache for 1h
 }));
-app.use((0, cors_1.default)({
-    origin: [
-        "http://localhost:3000",
-        "https://3000-firebase-pasar-frontend-1754754614515.cluster-lu4mup47g5gm4rtyvhzpwbfadi.cloudworkstations.dev",
-    ],
-    credentials: true,
-})); // Adjust origin as needed
-app.use((0, cookie_parser_1.default)());
 //Rate limiter more rateLimiter would be added at production nginx, crowdsec, fail2ban and modsecurity and owsap
 //Error handling middleware
 //app.use(errorMiddleware);

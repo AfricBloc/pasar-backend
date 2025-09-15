@@ -54,12 +54,12 @@ const createUser = async (req, res, next) => {
         res.cookie("session", token, {
             httpOnly: true,
             secure: env_config_1.ENV === "production",
-            sameSite: "lax",
+            sameSite: "none", //"lax",
             path: "/",
             // set a reasonable maxAge (24 hours); adjust as needed
             maxAge: 24 * 60 * 60 * 1000,
         });
-        (0, index_1.sendSuccess)(res, "Signin successful", {
+        (0, index_1.sendSuccess)(res, "Signup successful", {
             token: token,
             user: sanitizedUser, //Sanitize to remove sensitive details like password etc
         }, 201);
@@ -114,7 +114,7 @@ const signIn = async (req, res, next) => {
         res.cookie("session", token, {
             httpOnly: true,
             secure: env_config_1.ENV === "production",
-            sameSite: "lax",
+            sameSite: "none", //"lax",
             path: "/",
             maxAge: 24 * 60 * 60 * 1000,
         });
