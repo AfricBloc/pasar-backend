@@ -58,7 +58,8 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
     res.cookie("session", token, {
       httpOnly: true,
       secure: ENV === "production",
-      sameSite: "None", //"lax",
+      domain:"https://pasar-buy.vercel.app",
+      sameSite: "none", //"lax",
       path: "/",
       // set a reasonable maxAge (24 hours); adjust as needed
       maxAge: 24 * 60 * 60 * 1000,
@@ -131,7 +132,8 @@ const signIn = async (req: Request, res: Response, next: NextFunction) => {
     res.cookie("session", token, {
       httpOnly: true,
       secure: ENV === "production",
-      sameSite: "None", //"lax",
+      domain:"https://pasar-buy.vercel.app",
+      sameSite: "none", //"lax",
       path: "/",
       maxAge: 24 * 60 * 60 * 1000,
     });
@@ -154,7 +156,8 @@ const logout = (req: Request, res: Response) => {
   res.clearCookie("session", {
     httpOnly: true,
     secure: ENV === "production",
-    sameSite: "None",
+    domain:"https://pasar-buy.vercel.app",
+    sameSite: "none",
     path: "/", // ensure same path as set
   });
   res.status(200).json({ message: "Logged out" });
