@@ -31,6 +31,7 @@ app.use(
     origin: [
       "http://localhost:3000",
       "https://3000-firebase-pasar-frontend-1754754614515.cluster-lu4mup47g5gm4rtyvhzpwbfadi.cloudworkstations.dev",
+      "https://pasar-buy.vercel.app"
     ],
     credentials: true,
   })
